@@ -55,11 +55,11 @@ public class AMDecoder extends SquelchControlDecoder implements ISourceEventList
         IDecoderStateEventProvider, INoiseSquelchController
 {
     private final static Logger mLog = LoggerFactory.getLogger(AMDecoder.class);
-    private static final float DEMODULATOR_GAIN = 150.0f;
+    private static final float DEMODULATOR_GAIN = 1.0f;
     private static final float SQUELCH_ALPHA_DECAY = 0.0004f;
     private static final float MINIMUM_GAIN = 0.5f;
     private static final float MAXIMUM_GAIN = 16.0f;
-    private static final float OBJECTIVE_AUDIO_AMPLITUDE = 0.75f;
+    private static final float OBJECTIVE_AUDIO_AMPLITUDE = 0.95f;
     private AudioGainAndDcFilter mAGC = new AudioGainAndDcFilter(MINIMUM_GAIN, MAXIMUM_GAIN, OBJECTIVE_AUDIO_AMPLITUDE);
     private static final double DEMODULATED_AUDIO_SAMPLE_RATE = 8000.0;
     private IRealFilter mIBasebandFilter;
@@ -153,7 +153,7 @@ public class AMDecoder extends SquelchControlDecoder implements ISourceEventList
     {
         if(mResampledBufferListener != null)
         {
-            mResampledBufferListener.receive(demodulatedSamples);
+            mResampledBufferListener.receive(mAGC.process(demodulatedSamples));
 //            //Apply audio gain and rebroadcast
 //            super.broadcast(mAGC.process(demodulatedSamples));
         }
