@@ -41,9 +41,10 @@ import io.github.dsheirer.module.decode.am.AMDecoderState;
 import io.github.dsheirer.module.decode.am.DecodeConfigAM;
 import io.github.dsheirer.module.decode.config.AuxDecodeConfiguration;
 import io.github.dsheirer.module.decode.config.DecodeConfiguration;
-import io.github.dsheirer.module.decode.squelchDecoder.dcs.DCSDecoder;
-import io.github.dsheirer.module.decode.squelchDecoder.dcs.DCSDecoderState;
-import io.github.dsheirer.module.decode.squelchDecoder.dcs.DCSMessageFilter;
+import io.github.dsheirer.module.decode.nbfm.DeemphasisMode;
+import io.github.dsheirer.module.decode.squelch.dcs.DCSDecoder;
+import io.github.dsheirer.module.decode.squelch.dcs.DCSDecoderState;
+import io.github.dsheirer.module.decode.squelch.dcs.DCSMessageFilter;
 import io.github.dsheirer.module.decode.dmr.DMRDecoder;
 import io.github.dsheirer.module.decode.dmr.DMRDecoderState;
 import io.github.dsheirer.module.decode.dmr.DMRTrafficChannelManager;
@@ -460,7 +461,7 @@ public class DecoderFactory
         {
             filterList.add(new HighPassAudioFilter());
         }
-        if(decodeConfigNBFM.getDeemphasis() != null && decodeConfigNBFM.getDeemphasis() != DecodeConfigNBFM.DeemphasisMode.NONE)
+        if(decodeConfigNBFM.getDeemphasis() != null && decodeConfigNBFM.getDeemphasis() != DeemphasisMode.NONE)
         {
             float cutoff = (float) decodeConfigNBFM.getDeemphasis().getCutoff();
             filterList.add(new DeemphasisFilter(8000, cutoff, 1.0f));

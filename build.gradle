@@ -62,7 +62,7 @@ version = project.findProperty('projectVersion')
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
-        vendor = JvmVendorSpec.BELLSOFT
+        //vendor = JvmVendorSpec.BELLSOFT
     }
 }
 

@@ -1,6 +1,6 @@
 /*
  * *****************************************************************************
- * Copyright (C) 2014-2023 Dennis Sheirer
+ * Copyright (C) 2014-2026 Dennis Sheirer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * ****************************************************************************
  */
 
-package io.github.dsheirer.module.decode.squelchDecoder.dcs;
+package io.github.dsheirer.module.decode.squelch.dcs;
 
 import io.github.dsheirer.channel.state.DecoderStateEvent;
 import io.github.dsheirer.identifier.Identifier;
@@ -39,8 +39,8 @@ public class DCSMessage extends Message
     private String mDebugMessage = null;
     private DCSIdentifier mIdentifier = null;
     private boolean mMutedStatus = true;
-    private DecoderStateEvent.Event mCallEvent;
-    private SquelchCodeState mCodeState;
+    private DecoderStateEvent.Event mCallEvent = DecoderStateEvent.Event.END;
+    private SquelchCodeState mCodeState = SquelchCodeState.LOST;
 
     public enum SquelchCodeState
     {
@@ -48,6 +48,7 @@ public class DCSMessage extends Message
         REJECTED,
         LOST
     }
+
     /**
      * Constructs an instance
      * @param code that was detected
@@ -58,16 +59,37 @@ public class DCSMessage extends Message
         super();
         mDCSCode = code;
     }
+
+    /**
+     * Constructs an instance
+     * @param configuredCode that was detected
+     */
     public DCSMessage(DCSCode configuredCode)
     {
         super();    // takes care of timestamp
         mConfiguredCode = configuredCode;
     }
 
+    /**
+     * Constructs an instance
+     * @param configuredCode that was detected
+     * @param initialMessage for debug or log
+     */
+    public DCSMessage(DCSCode configuredCode, String initialMessage)
+    {
+        super();    // takes care of timestamp
+        mConfiguredCode = configuredCode;
+        mDebugMessage = initialMessage;
+    }
+
+    /**
+     * Constructs an instance
+     */
     public DCSMessage()
     {
         super();
     }
+
     @Override
     public String toString()
     {

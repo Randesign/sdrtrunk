@@ -17,7 +17,7 @@
  * ****************************************************************************
  */
 
-package io.github.dsheirer.module.decode.squelchDecoder.dcs;
+package io.github.dsheirer.module.decode.squelch.dcs;
 
 import io.github.dsheirer.channel.state.DecoderStateEvent;
 import io.github.dsheirer.dsp.filter.FilterFactory;
@@ -82,7 +82,6 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
     private int mCodewordsSinceMatch = 0;
     private DCSCode mConfiguredCode = null;
     private int mSamplesToSkip = 0;
-    private DCSMessage detectionMessage = null;
     private boolean mMuted = true;
     private int mBitCounter = 0;
 
@@ -145,6 +144,11 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
         return DecoderType.DCS;
     }
 
+    public DCSCode getmConfiguredCode()
+    {
+        return mConfiguredCode;
+    }
+
     /**
      * Implementation of the IRealBufferListener interface
      */
@@ -166,16 +170,12 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
     /**
      * Process this audio buffer looking for a DCS code. It takes 2.6 512 sample-sized buffers to detecte a code.
      * @param samples audio samples to decode (array size is 512)
-     * @return DCSMessage to notify a caller (usually NBFMDecoder) that a code was receieved or not for this audio buffer.
+     * @return DCSMessage to notify a caller (usually NBFMDecoder) that a code was received or not for this audio buffer.
      * Since it requires 2.6 buffers to detect/reject a code, this is usually null. Null indicates no state change.
      */
     public DCSMessage process(float[] samples)
     {
         DCSMessage inlineDCSMessage = null;
-        if(!mInlineMode)
-        {
-            detectionMessage = new DCSMessage();
-        }
         if(getMessageListener() != null || mInlineMode)
         {
             float[] filtered = mLowPassFilter.filter(samples);
@@ -271,7 +271,7 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
                         {
                             if(DCSCode.hasValue(mCode))
                             {
-                                detectionMessage.setDCSCode(DCSCode.fromValue(mCode));
+                                DCSMessage detectionMessage = new DCSMessage(DCSCode.fromValue(mCode));
                                 getMessageListener().receive(detectionMessage);
                             }
                         }
@@ -280,7 +280,7 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
                             if(DCSCode.hasValue(mCode))
                             {
                                 // a valid code has been received. Don't know if it's the one we're looking for
-                                inlineDCSMessage = detectionLogicTree(DCSCode.fromValue(mCode));
+                                inlineDCSMessage = updateDetectionState(DCSCode.fromValue(mCode));
                                 mBitCounter = 0;
                             }
                             else
@@ -291,11 +291,10 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
                                 }
                                 else // No code has been detected in 24 bit periods, signal it's gone OR never received
                                 {
-                                    inlineDCSMessage = detectionLogicTree(null);
+                                    inlineDCSMessage = updateDetectionState(null);
                                     mBitCounter = 0;
                                 }
                             }
-
                         }
 
                         mBaudCounter -= BAUD_LENGTH;
@@ -381,25 +380,19 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
      * Called when noiseSquelch closes in inlineMode
      * @return DCSMessage
      */
-    public DCSMessage inlineReset()
+    public void inlineReset()
     {
         reset();
         mMuted = true;
-        DCSMessage message = new DCSMessage(mConfiguredCode);
-        message.setMessage("Noise squelch closed.");
-        message.setDCSCode(null);
-        message.setMutedStatus(true);
-        message.setCallEvent(DecoderStateEvent.Event.END);
-        message.setCodeState(DCSMessage.SquelchCodeState.LOST);
-        return message;
     }
+
     /**
      * Handles detection logic of a decoded DCS code in inlineMode. This is called when there is a valid code
      * or at least 23 bit periods have elapsed since the previous code, if any.
      * @param newCode currently detected DCS code, or null if no code detected
      * @return DCSMessage containing detected code, optional string message, call event info, muted status
      */
-    private DCSMessage detectionLogicTree(DCSCode newCode)
+    private DCSMessage updateDetectionState(DCSCode newCode)
     {
         DCSMessage detectionMessage = new DCSMessage(mConfiguredCode);
         if (mMuted)

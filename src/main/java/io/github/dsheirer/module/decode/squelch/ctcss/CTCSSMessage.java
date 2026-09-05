@@ -17,7 +17,7 @@
  * ****************************************************************************
  */
 
-package io.github.dsheirer.module.decode.squelchDecoder.ctcss;
+package io.github.dsheirer.module.decode.squelch.ctcss;
 
 import io.github.dsheirer.channel.state.DecoderStateEvent;
 import io.github.dsheirer.identifier.Identifier;
@@ -40,10 +40,10 @@ public class CTCSSMessage extends Message
     private CTCSSIdentifier mIdentifier = null;
     private boolean mMutedStatus = true;
     private boolean mFirstThreshold = false;
-    private double mPower;
-    private double mPowerThreshold;
-    private DecoderStateEvent.Event mCallEvent;
-    private SquelchCodeState mCodeState;
+    private double mPower = 0.0;
+    private double mPowerThreshold = 0.0;
+    private DecoderStateEvent.Event mCallEvent = DecoderStateEvent.Event.END;
+    private SquelchCodeState mCodeState = CTCSSMessage.SquelchCodeState.LOST;
 
     public enum SquelchCodeState
     {
@@ -68,6 +68,13 @@ public class CTCSSMessage extends Message
     {
         super();            // takes care of timestamp
         mConfiguredCode = configuredCode;
+    }
+
+    public CTCSSMessage(CTCSSCode configuredCode, String initialMessage)
+    {
+        super();            // takes care of timestamp
+        mConfiguredCode = configuredCode;
+        mDebugMessage = initialMessage;
     }
 
     @Override
