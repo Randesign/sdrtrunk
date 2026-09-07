@@ -27,6 +27,7 @@ import io.github.dsheirer.dsp.filter.fir.real.IRealFilter;
 import io.github.dsheirer.dsp.filter.fir.remez.RemezFIRFilterDesigner;
 import io.github.dsheirer.module.decode.Decoder;
 import io.github.dsheirer.module.decode.DecoderType;
+import io.github.dsheirer.module.decode.squelch.SquelchCodeState;
 import io.github.dsheirer.sample.Listener;
 import io.github.dsheirer.sample.real.IRealBufferListener;
 import org.slf4j.Logger;
@@ -407,7 +408,7 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
                     detectionMessage.setDCSCode(newCode);
                     detectionMessage.setMessage("Correct DCS code detected, confirmation passed, now unmuting.");
                     detectionMessage.setCallEvent(DecoderStateEvent.Event.START);
-                    detectionMessage.setCodeState(DCSMessage.SquelchCodeState.ACCEPTED);
+                    detectionMessage.setCodeState(SquelchCodeState.ACCEPTED);
                     mCodewordsSinceMatch = 0;
                 }
                 else
@@ -425,11 +426,11 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
                 detectionMessage.setDCSCode(newCode);
                 if(newCode != null)
                 {
-                    detectionMessage.setCodeState(DCSMessage.SquelchCodeState.REJECTED);
+                    detectionMessage.setCodeState(SquelchCodeState.REJECTED);
                 }
                 else
                 {
-                    detectionMessage.setCodeState(DCSMessage.SquelchCodeState.LOST);
+                    detectionMessage.setCodeState(SquelchCodeState.LOST);
                 }
             }
         }
@@ -456,11 +457,11 @@ public class DCSDecoder extends Decoder implements IRealBufferListener, Listener
                     mConfirmationCounter = 0;
                     if(newCode != null)
                     {
-                        detectionMessage.setCodeState(DCSMessage.SquelchCodeState.REJECTED);
+                        detectionMessage.setCodeState(SquelchCodeState.REJECTED);
                     }
                     else
                     {
-                        detectionMessage.setCodeState(DCSMessage.SquelchCodeState.LOST);
+                        detectionMessage.setCodeState(SquelchCodeState.LOST);
                     }
                 }
                 else

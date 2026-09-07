@@ -20,6 +20,7 @@
 package io.github.dsheirer.module.decode.squelch.ctcss;
 
 import io.github.dsheirer.channel.state.DecoderStateEvent;
+import io.github.dsheirer.module.decode.squelch.SquelchCodeState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -218,7 +219,7 @@ public class CTCSSDetector
                     ctcssMessage.setCTCSSCode(newCode);
                     ctcssMessage.setMessage("Correct tone detected, thresholds passed, now unmuting.");
                     ctcssMessage.setCallEvent(DecoderStateEvent.Event.START);
-                    ctcssMessage.setCodeState(CTCSSMessage.SquelchCodeState.ACCEPTED);
+                    ctcssMessage.setCodeState(SquelchCodeState.ACCEPTED);
                     mCloseCounter = 0;
                 }
                 else
@@ -245,7 +246,7 @@ public class CTCSSDetector
                     {
                         if(newCode == mPreviousRejectedCode)
                         {
-                            ctcssMessage.setCodeState(CTCSSMessage.SquelchCodeState.REJECTED);
+                            ctcssMessage.setCodeState(SquelchCodeState.REJECTED);
                             // this will increment past the OPEN_THRESHOLD_COUNT so the rejected state is only sent once.
                             mRejectedQualification++;
                         }
@@ -271,7 +272,7 @@ public class CTCSSDetector
                 }
                 else
                 {
-                    ctcssMessage.setCodeState(CTCSSMessage.SquelchCodeState.LOST);
+                    ctcssMessage.setCodeState(SquelchCodeState.LOST);
                 }
             }
         }
@@ -298,11 +299,11 @@ public class CTCSSDetector
                     mOpenCounter = 0;
                     if(newCode != null)
                     {
-                        ctcssMessage.setCodeState(CTCSSMessage.SquelchCodeState.REJECTED);
+                        ctcssMessage.setCodeState(SquelchCodeState.REJECTED);
                     }
                     else
                     {
-                        ctcssMessage.setCodeState(CTCSSMessage.SquelchCodeState.LOST);
+                        ctcssMessage.setCodeState(SquelchCodeState.LOST);
                     }
                 }
                 else

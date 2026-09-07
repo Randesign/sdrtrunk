@@ -23,6 +23,7 @@ import io.github.dsheirer.channel.state.DecoderStateEvent;
 import io.github.dsheirer.identifier.Identifier;
 import io.github.dsheirer.identifier.ctcss.CTCSSIdentifier;
 import io.github.dsheirer.message.Message;
+import io.github.dsheirer.module.decode.squelch.SquelchCodeState;
 import io.github.dsheirer.protocol.Protocol;
 
 import java.text.MessageFormat;
@@ -34,6 +35,7 @@ import java.util.List;
  */
 public class CTCSSMessage extends Message
 {
+    // null is a necessary default for many of these
     private CTCSSCode mConfiguredCode = null;
     private CTCSSCode mCTCSSCode = null;
     private String mDebugMessage = null;
@@ -42,15 +44,8 @@ public class CTCSSMessage extends Message
     private boolean mFirstThreshold = false;
     private double mPower = 0.0;
     private double mPowerThreshold = 0.0;
-    private DecoderStateEvent.Event mCallEvent = DecoderStateEvent.Event.END;
-    private SquelchCodeState mCodeState = CTCSSMessage.SquelchCodeState.LOST;
-
-    public enum SquelchCodeState
-    {
-        ACCEPTED,
-        REJECTED,
-        LOST
-    }
+    private DecoderStateEvent.Event mCallEvent = null;
+    private SquelchCodeState mCodeState = null;
 
     /**
      * Constructs an instance
@@ -70,11 +65,13 @@ public class CTCSSMessage extends Message
         mConfiguredCode = configuredCode;
     }
 
-    public CTCSSMessage(CTCSSCode configuredCode, String initialMessage)
+    public CTCSSMessage(CTCSSCode configuredCode, String initialMessage, DecoderStateEvent.Event decoderEvent, SquelchCodeState codeState)
     {
         super();            // takes care of timestamp
         mConfiguredCode = configuredCode;
         mDebugMessage = initialMessage;
+        mCallEvent = decoderEvent;
+        mCodeState = codeState;
     }
 
     @Override

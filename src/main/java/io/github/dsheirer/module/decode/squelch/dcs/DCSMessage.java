@@ -23,6 +23,7 @@ import io.github.dsheirer.channel.state.DecoderStateEvent;
 import io.github.dsheirer.identifier.Identifier;
 import io.github.dsheirer.identifier.dcs.DCSIdentifier;
 import io.github.dsheirer.message.Message;
+import io.github.dsheirer.module.decode.squelch.SquelchCodeState;
 import io.github.dsheirer.protocol.Protocol;
 
 import java.text.MessageFormat;
@@ -34,20 +35,14 @@ import java.util.List;
  */
 public class DCSMessage extends Message
 {
+    // null is a necessary default for many of these
     private DCSCode mDCSCode = null;
     private DCSCode mConfiguredCode = null;
     private String mDebugMessage = null;
     private DCSIdentifier mIdentifier = null;
     private boolean mMutedStatus = true;
-    private DecoderStateEvent.Event mCallEvent = DecoderStateEvent.Event.END;
-    private SquelchCodeState mCodeState = SquelchCodeState.LOST;
-
-    public enum SquelchCodeState
-    {
-        ACCEPTED,
-        REJECTED,
-        LOST
-    }
+    private DecoderStateEvent.Event mCallEvent = null;
+    private SquelchCodeState mCodeState = null;
 
     /**
      * Constructs an instance
@@ -71,15 +66,19 @@ public class DCSMessage extends Message
     }
 
     /**
-     * Constructs an instance
+     * Constructs an instance, usually at squelch close
      * @param configuredCode that was detected
      * @param initialMessage for debug or log
+     * @param callEvent for the initial DecoderStateEvent (usually END)
+     * @param codeState for the initial code state (usually LOST)
      */
-    public DCSMessage(DCSCode configuredCode, String initialMessage)
+    public DCSMessage(DCSCode configuredCode, String initialMessage, DecoderStateEvent.Event callEvent, SquelchCodeState codeState)
     {
         super();    // takes care of timestamp
         mConfiguredCode = configuredCode;
         mDebugMessage = initialMessage;
+        mCallEvent = callEvent;
+        mCodeState = codeState;
     }
 
     /**

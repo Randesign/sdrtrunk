@@ -37,9 +37,9 @@ import io.github.dsheirer.dsp.squelch.NoiseSquelchState;
 import io.github.dsheirer.dsp.window.WindowType;
 import io.github.dsheirer.module.decode.DecoderType;
 import io.github.dsheirer.module.decode.SquelchControlDecoder;
+import io.github.dsheirer.module.decode.squelch.SquelchCodeState;
 import io.github.dsheirer.module.decode.squelch.ctcss.CTCSSMessage;
 import io.github.dsheirer.module.decode.squelch.dcs.DCSDecoder;
-import io.github.dsheirer.module.decode.squelch.dcs.DCSEncode;
 import io.github.dsheirer.module.decode.squelch.dcs.DCSMessage;
 import io.github.dsheirer.module.decode.squelch.SquelchDecoderConfig;
 import io.github.dsheirer.module.decode.squelch.ctcss.CTCSSCode;
@@ -544,7 +544,10 @@ public class NBFMDecoder extends SquelchControlDecoder implements ISourceEventLi
             if(mCTCSSDetector != null)
             {
                 mCTCSSDetector.reset();
-                CTCSSMessage message = new CTCSSMessage(mConfiguredCTCSSCodes.getFirst(), "Noise squelch closed.");
+                CTCSSMessage message = new CTCSSMessage(mConfiguredCTCSSCodes.getFirst(),
+                        "Noise squelch closed.",
+                        DecoderStateEvent.Event.END,
+                        SquelchCodeState.LOST);
                 getMessageListener().receive(message);     // sending: one of the listeners is NBFMDecoderState
                 notifyCallEnd();
                 mMute = true;
@@ -552,7 +555,10 @@ public class NBFMDecoder extends SquelchControlDecoder implements ISourceEventLi
             if(mDCSDetector != null)
             {
                 mDCSDetector.inlineReset();
-                DCSMessage message = new DCSMessage(mDCSDetector.getmConfiguredCode(), "Noise squelch closed.");
+                DCSMessage message = new DCSMessage(mDCSDetector.getmConfiguredCode(),
+                        "Noise squelch closed.",
+                        DecoderStateEvent.Event.END,
+                        SquelchCodeState.LOST);
                 getMessageListener().receive(message);       // sending: one of the listeners is NBFMDecoderState
                 notifyCallEnd();
                 mMute = true;
